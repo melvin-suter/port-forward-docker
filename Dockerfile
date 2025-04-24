@@ -13,11 +13,12 @@ ARG DEF_LOCAL_PORT=8000
 
 ENV REMOTE_PORT=$DEF_REMOTE_PORT
 ENV LOCAL_PORT=$DEF_LOCAL_PORT
+ENV PROTO=tcp
 
 ## By default container listens on $LOCAL_PORT (8000)
 EXPOSE 8000
 
 USER 1001
 
-CMD socat tcp-listen:$LOCAL_PORT,reuseaddr,fork tcp:$REMOTE_HOST:$REMOTE_PORT & pid=$! && trap "kill $pid" SIGINT && \
-	echo "Socat started listening on $LOCAL_PORT: Redirecting traffic to $REMOTE_HOST:$REMOTE_PORT ($pid)" && wait $pid
+CMD socat $PROTO-listen:$LOCAL_PORT,reuseaddr,fork $PROTO:$REMOTE_HOST:$REMOTE_PORT & pid=$! && trap "kill $pid" SIGINT && \
+	echo "Socat started listening on $LOCAL_PORT/$PROTO: Redirecting traffic to $REMOTE_HOST:$REMOTE_PORT/$PROTO ($pid)" && wait $pid
